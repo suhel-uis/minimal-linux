@@ -3,7 +3,7 @@
 DEFAULT_BURP_VERSION="2024.12.1"  # Default version if fetching fails
 
 # Use curl to fetch the webpage and grep to find the version number
-BURP_VERSION_RAW=<span class="math-inline">\(curl \-s "</span>{BURP_VERSION_PAGE_URL}" | grep -oP 'Burp Suite Community Edition \K\d+\.\d+\.\d+')
+BURP_VERSION_RAW=$(curl -s "${BURP_VERSION_PAGE_URL}" | grep -oP 'Burp Suite Community Edition \K\d+\.\d+\.\d+')
 
 # Check if version extraction was successful
 if [ -z "${BURP_VERSION_RAW}" ]; then
