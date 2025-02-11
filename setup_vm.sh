@@ -20,7 +20,7 @@ fi
 if [ -z "$1" ]; then
   echo "Error: Chrome Remote Desktop code is missing."
   echo "Usage: sudo bash <script_name.sh> <chrome_remote_desktop_code>"
-  echo "Please provide the Chrome Remote Desktop code as a command-line argument."
+  echo "       Please provide the Chrome Remote Desktop code as a command-line argument."
   exit 1 # Exit with an error code
 fi
 
@@ -59,7 +59,7 @@ sudo apt install -y /tmp/chrome-remote-desktop_current_amd64.deb
 
 # Execute Chrome Remote Desktop start-host command with the provided code
 echo "Executing Chrome Remote Desktop start-host command with provided code..."
-DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
+sudo -u $USER DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name=$USER
 
 # Install Google Chrome Stable (using apt to handle dependencies)
 echo "Installing Google Chrome Stable..."
