@@ -7,12 +7,12 @@ BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'P
 
 # Check if version extraction was successful
 if [ -z "${BURP_VERSION_RAW}" ]; then
-  echo "Warning: Could not automatically determine the latest Burp Suite version."
-  echo "Falling back to default Burp Suite version: <span class="math-inline">\{DEFAULT\_BURP\_VERSION\}"
-BURP\_VERSION\="</span>{DEFAULT_BURP_VERSION}" # Use default version
+  echo "Warning: Could not automatically determine the latest Burp Suite version."
+  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
+BURP_VERSION="${DEFAULT_BURP_VERSION}" # Use default version
 else
-  BURP_VERSION="${BURP_VERSION_RAW}"
-  echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
+  BURP_VERSION="${BURP_VERSION_RAW}"
+  echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 # -----------------------------------------------------
 
@@ -58,5 +58,40 @@ sudo wget "https://portswigger.net/burp/releases/startdownload?product=community
 sudo chmod 777 burpsuite && \
 sudo ./burpsuite -q
 
+# -----------------------------------------------------
+# Configure PERSISTENT System-Wide Proxy Settings for GUI Login using gsettings AFTER installation
+echo "-----------------------------------------------------"
+echo "Configuring PERSISTENT system-wide proxy settings for GUI login to 127.0.0.1:8080 using gsettings..."
+echo "WARNING: This will set system-wide proxy settings using gsettings."
+echo "         These settings are designed to be persistent across GUI logins and reboots."
+echo "         They are primarily respected by GUI applications in GNOME-based environments."
+echo "         Command-line tools and non-GNOME applications might require separate configuration."
+echo "         To disable PERSISTENTLY, you will need to use gsettings commands or GUI settings."
+echo "-----------------------------------------------------"
+
+# Set proxy mode to 'manual'
+sudo -u $USER gsettings set org.gnome.system.proxy mode 'manual'
+
+# Set HTTP proxy settings
+sudo -u $USER gsettings set org.gnome.system.proxy.http host '127.0.0.1'
+sudo -u $USER gsettings set org.gnome.system.proxy.http port 8080
+
+# Set HTTPS proxy settings
+sudo -u $USER gsettings set org.gnome.system.proxy.https host '127.0.0.1'
+sudo -u $USER gsettings set org.gnome.system.proxy.https port 8080
+
+# (Optional) Set ignore hosts (no_proxy) - adjust as needed
+sudo -u $USER gsettings set org.gnome.system.proxy ignore-hosts "['localhost', '127.0.0.1', '$(hostname -I)']"
+
+echo "Persistent system-wide proxy settings configured for GUI login using gsettings."
+echo "Proxy settings should be active in GUI applications after login/reboot."
+echo "-----------------------------------------------------"
+echo "To DISABLE PERSISTENT system-wide proxy settings set by this script:"
+echo "  Option 1: Run the following commands in a terminal:"
+echo "    gsettings set org.gnome.system.proxy mode 'none'"
+echo "  Option 2: Use the Network settings GUI to disable the proxy:"
+echo "    (You might find proxy settings under Network settings or System Settings -> Network -> Network Proxy)"
+echo "-----------------------------------------------------"
+
 echo "All commands executed. Please check for any errors above."
-echo "Installation process completed!"
+echo "Installation and persistent GUI proxy configuration process completed!"
