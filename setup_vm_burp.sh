@@ -19,47 +19,6 @@ else
 fi
 # -----------------------------------------------------
 
-# Update package lists to ensure you have the latest versions
-sudo apt update
-
-# Install minimal Xorg server...
-echo "Installing minimal Xorg server..."
-sudo apt install -y xorg
-
-# Install Openbox window manager...
-echo "Installing Openbox window manager..."
-sudo apt install -y openbox
-
-# Install LXTerminal terminal emulator...
-echo "Installing LXTerminal terminal emulator..."
-sudo apt install -y lxterminal
-
-# Install Network Manager GUI...
-echo "Installing Network Manager GUI..."
-sudo apt install -y network-manager-gnome
-
-# Install jgmenu for application menu...
-echo "Installing jgmenu for application menu..."
-sudo apt install -y jgmenu
-
-# Install PCManFM file manager...
-echo "Installing PCManFM file manager..."
-sudo apt install -y pcmanfm
-
-# (Optional) Install policykit-1-gnome - might be needed for GUI authentication
-echo "Installing PolicyKit GUI agent (optional)..."
-sudo apt install -y policykit-1-gnome
-
-# Install Chrome Remote Desktop...
-echo "Installing Chrome Remote Desktop..."
-curl -o /tmp/chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb && \
-sudo apt install -y /tmp/chrome-remote-desktop_current_amd64.deb
-
-# Install Google Chrome Stable...
-echo "Installing Google Chrome Stable..."
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-sudo apt install -y ./google-chrome-stable_current_amd64.deb
-
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
 sudo wget "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && \
