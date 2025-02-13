@@ -3,67 +3,81 @@
 # Start timer
 start_time=$(date +%s)
 
-DEFAULT_BURP_VERSION="2024.12.1"
+DEFAULT_BURP_VERSION="2024.12.1"  # Default version if fetching fails
 
-# Fetch Burp version (improved error handling)
+# Use curl to fetch the webpage and grep to find the version number
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
+# Check if version extraction was successful
 if [ -z "${BURP_VERSION_RAW}" ]; then
   echo "Warning: Could not automatically determine the latest Burp Suite version."
-  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
-  BURP_VERSION="${DEFAULT_BURP_VERSION}"
+  echo "Falling back to default Burp Suite version: <span class="math-inline">\{DEFAULT\_BURP\_VERSION\}"
+BURP\_VERSION\="</span>{DEFAULT_BURP_VERSION}" # Use default version
 else
   BURP_VERSION="${BURP_VERSION_RAW}"
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
+# -----------------------------------------------------
 
-# Update package lists (combined for efficiency)
-echo "Updating package lists..."
+# Update package lists to ensure you have the latest versions
 sudo apt update
 
-# Install packages (combined for efficiency and better readability)
-echo "Installing minimal desktop environment and essential tools..."
-sudo apt install -y xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
+# Install minimal Xorg, Openbox, Terminal, Network Manager GUI, Menu, and File Manager
+echo "Installing minimal Xorg server..."
+sudo apt install -y xorg
 
-# Install Chrome Remote Desktop (improved error handling and cleanup)
+echo "Installing Openbox window manager..."
+sudo apt install -y openbox
+
+echo "Installing LXTerminal terminal emulator..."
+sudo apt install -y lxterminal
+
+echo "Installing Network Manager GUI..."
+sudo apt install -y network-manager-gnome
+
+echo "Installing jgmenu for application menu..."
+sudo apt install -y jgmenu
+
+echo "Installing PCManFM file manager..."
+sudo apt install -y pcmanfm
+
+# (Optional) Install policykit-1-gnome - might be needed for GUI authentication
+echo "Installing PolicyKit GUI agent (optional)..."
+sudo apt install -y policykit-1-gnome
+
+# Install Chrome Remote Desktop
 echo "Installing Chrome Remote Desktop..."
-wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O /tmp/chrome-remote-desktop.deb  # More descriptive filename
-if [ $? -eq 0 ]; then # Check wget success
-    sudo apt install -y /tmp/chrome-remote-desktop.deb
-    rm /tmp/chrome-remote-desktop.deb # Cleanup
-else
-    echo "Error: Failed to download Chrome Remote Desktop."
-    exit 1 # Or handle differently
-fi
+curl -o /tmp/chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb && \
+sudo apt install -y /tmp/chrome-remote-desktop_current_amd64.deb
 
-# Install Google Chrome Stable (improved error handling and cleanup)
+# Install Google Chrome Stable (using apt to handle dependencies)
 echo "Installing Google Chrome Stable..."
-wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O /tmp/google-chrome-stable.deb # More descriptive filename
-if [ $? -eq 0 ]; then # Check wget success
-  sudo apt install -y ./tmp/google-chrome-stable.deb
-  rm /tmp/google-chrome-stable.deb # Cleanup
-else
-  echo "Error: Failed to download Google Chrome Stable."
-  exit 1 # Or handle differently
-fi
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-
-# Install Burp Suite Community Edition (improved error handling and permissions)
+# Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
-wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite
-if [ $? -eq 0 ]; then # Check wget success
-  chmod +x burpsuite # More secure than 777
-  sudo ./burpsuite -q
-else
-  echo "Error: Failed to download Burp Suite."
-  exit 1 # Or handle differently
-fi
+sudo wget "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && \
+sudo chmod 777 burpsuite && \
+sudo ./burpsuite -q
 
 # End timer and calculate duration
 end_time=$(date +%s)
 duration=$((end_time - start_time))
 
-echo "All commands executed. Please check for any errors above."
-echo "Installation process completed in ${duration} seconds."
+# Calculate hours, minutes, and seconds
+duration_hours=$((duration_seconds / 3600))
+duration_minutes=$(( (duration_seconds % 3600) / 60 ))
+duration_secs=$((duration_seconds % 60))
 
-exit 0 # Indicate successful completion
+# Format the duration output
+if [ $duration_hours -gt 0 ]; then
+  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
+elif [ $duration_minutes -gt 0 ]; then
+  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
+else
+  duration_output="${duration_secs} seconds"
+fi
+
+echo "All commands executed. Please check for any errors above."
+echo "Installation process completed in ${duration_output}."
