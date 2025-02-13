@@ -87,6 +87,17 @@ echo "Burp Suite CA Certificate downloaded and saved to: ${CERT_FILE}"
 echo "Please import this certificate from your Downloads folder into your browser(s) to intercept HTTPS traffic."
 echo "Instructions can be found at: https://portswigger.net/burp/documentation/desktop/ca-certificate/index.net"
 
+# ---  STOP BURP SUITE ---
+echo "Stopping Burp Suite..."
+BURP_PID=$(pidof burpsuite) # Find the Process ID of Burp Suite
+if [ -n "${BURP_PID}" ]; then # Check if PID was found
+  kill "${BURP_PID}"         # Terminate the Burp Suite process
+  echo "Burp Suite process (PID: ${BURP_PID}) terminated."
+else
+  echo "Warning: Could not find Burp Suite process to terminate."
+fi
+sleep 5 # Give time for Burp Suite to fully shutdown
+
 # End timer and calculate duration
 end_time=$(date +%s)
 duration_seconds=$((end_time - start_time))
