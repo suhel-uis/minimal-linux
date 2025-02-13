@@ -19,6 +19,11 @@ else
 fi
 # -----------------------------------------------------
 
+# Install Google Chrome Stable...
+echo "Installing Google Chrome Stable..."
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+sudo apt install -y ./google-chrome-stable_current_amd64.deb
+
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
 sudo wget "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && \
@@ -28,7 +33,6 @@ sudo ./burpsuite -q #  <- Removed -q for possible background operation and will 
 # Start Burp Suite in the background
 echo "Starting Burp Suite in the background..."
 nohup ./burpsuite --no-ui &  # Start Burp Suite without GUI in background
-sleep 10 # Wait for Burp Suite to start and initialize web server for CA cert
 
 # Determine Downloads directory
 DOWNLOADS_DIR="$HOME/Downloads"
@@ -37,14 +41,34 @@ if [ ! -d "${DOWNLOADS_DIR}" ]; then
   DOWNLOADS_DIR="$HOME" # Fallback to home directory if Downloads doesn't exist
 fi
 
-# Download Burp Suite CA Certificate to Downloads folder
+# Download Burp Suite CA Certificate to Downloads folder with retry mechanism
 CERT_FILE="${DOWNLOADS_DIR}/burpsuite_ca.crt" # Define where to save the certificate in Downloads
-echo "Downloading Burp Suite CA Certificate to ${CERT_FILE}..."
-curl http://burpsuite/cert -o "${CERT_FILE}"
+RETRY_COUNT=5
+RETRY_DELAY=5 # seconds
+attempt=1
 
-echo "Burp Suite CA Certificate downloaded and saved to: ${CERT_FILE}"
-echo "Please import this certificate from your Downloads folder into your browser(s) to intercept HTTPS traffic."
-echo "Instructions can be found at: https://portswigger.net/burp/documentation/desktop/ca-certificate/index.net"
+while true; do
+  echo "Attempt ${attempt}: Downloading Burp Suite CA Certificate to ${CERT_FILE}..."
+  if curl http://burpsuite/cert -o "${CERT_FILE}"; then
+    echo "Burp Suite CA Certificate downloaded and saved to: ${CERT_FILE}"
+    break # Download successful, exit loop
+  else
+    if [ "$attempt" -lt "$RETRY_COUNT" ]; then
+      echo "Download failed. Retrying in ${RETRY_DELAY} seconds..."
+      sleep ${RETRY_DELAY}
+      attempt=$((attempt + 1))
+    else
+      echo "Error: Failed to download Burp Suite CA Certificate after ${RETRY_COUNT} attempts."
+      CERT_FILE_DOWNLOAD_FAILED=true # Flag to indicate download failure
+      break # Exit loop after max retries
+    fi
+  fi
+done
+
+if [ -z "$CERT_FILE_DOWNLOAD_FAILED" ]; then # Only show instructions if download was successful
+  echo "Please import this certificate from your Downloads folder into your browser(s) to intercept HTTPS traffic."
+  echo "Instructions can be found at: https://portswigger.net/burp/documentation/desktop/ca-certificate/index.net"
+fi
 
 # ---  STOP BURP SUITE ---
 echo "Stopping Burp Suite..."
