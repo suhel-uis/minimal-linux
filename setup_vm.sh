@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Start timer
+start_time=$(date +%s)
+
 DEFAULT_BURP_VERSION="2024.12.1"  # Default version if fetching fails
 
 # Use curl to fetch the webpage and grep to find the version number
@@ -58,5 +61,9 @@ sudo wget "https://portswigger.net/burp/releases/startdownload?product=community
 sudo chmod 777 burpsuite && \
 sudo ./burpsuite -q
 
+# End timer and calculate duration
+end_time=$(date +%s)
+duration=$((end_time - start_time))
+
 echo "All commands executed. Please check for any errors above."
-echo "Installation process completed!"
+echo "Installation process completed in ${duration} seconds."
