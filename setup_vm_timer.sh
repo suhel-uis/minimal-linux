@@ -5,7 +5,7 @@ start_time=$(date +%s)
 
 DEFAULT_BURP_VERSION="2024.12.1"
 
-# Fetch Burp version with a timeout and error handling
+# Fetch Burp version with timeout
 BURP_VERSION_RAW=$(curl -s --connect-timeout 5 "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
 if [ -z "${BURP_VERSION_RAW}" ]; then
@@ -16,19 +16,23 @@ else
   echo "Burp Suite version: ${BURP_VERSION}"
 fi
 
-# Install packages (combine commands and use -yqq)
-echo "Installing minimal desktop environment and applications..."
-sudo apt install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
+# Update package lists
+echo "Updating package lists..."
+sudo apt update -yqq
 
-# Install Chrome Remote Desktop (download with wget for potential speed improvement, and install without download)
+# Install LXDE (Lightweight DE)
+echo "Installing LXDE..."
+sudo apt install -yqq lxde
+
+# Install Chrome Remote Desktop
 echo "Installing Chrome Remote Desktop..."
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" && sudo apt install -yqq "./chrome-remote-desktop_current_amd64.deb" && rm "./chrome-remote-desktop_current_amd64.deb"
 
-# Install Google Chrome Stable (download with wget, install without download, and remove .deb)
+# Install Google Chrome Stable
 echo "Installing Google Chrome Stable..."
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" && sudo apt install -yqq "./google-chrome-stable_current_amd64.deb" && rm "./google-chrome-stable_current_amd64.deb"
 
-# Install Burp Suite Community Edition (wget for download, install without downloading, and remove burpsuite)
+# Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && sudo chmod +x burpsuite && sudo ./burpsuite -q && rm burpsuite
 
