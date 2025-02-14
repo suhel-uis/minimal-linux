@@ -16,10 +16,6 @@ else
   echo "Burp Suite version: ${BURP_VERSION}"
 fi
 
-# Update package lists (combine commands)
-echo "Updating package lists..."
-sudo apt update -yqq # -y for yes to all prompts, -qq for quiet (less verbose)
-
 # Install packages (combine commands and use -yqq)
 echo "Installing minimal desktop environment and applications..."
 sudo apt install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
