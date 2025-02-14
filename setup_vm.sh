@@ -19,51 +19,43 @@ else
 fi
 # -----------------------------------------------------
 
-# Update package lists to ensure you have the latest versions
-sudo apt update
+# Update package lists (combine commands)
+echo "Updating package lists..."
+sudo apt update -yqq # -y for yes to all prompts, -qq for quiet (less verbose)
 
-# Install minimal Xorg, Openbox, Terminal, Network Manager GUI, Menu, and File Manager
-echo "Installing minimal Xorg server..."
-sudo apt install -y xorg
+# Install packages (combine commands and use -yqq)
+echo "Installing minimal desktop environment and applications..."
+sudo apt install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
 
-echo "Installing Openbox window manager..."
-sudo apt install -y openbox
-
-echo "Installing LXTerminal terminal emulator..."
-sudo apt install -y lxterminal
-
-echo "Installing Network Manager GUI..."
-sudo apt install -y network-manager-gnome
-
-echo "Installing jgmenu for application menu..."
-sudo apt install -y jgmenu
-
-echo "Installing PCManFM file manager..."
-sudo apt install -y pcmanfm
-
-# (Optional) Install policykit-1-gnome - might be needed for GUI authentication
-echo "Installing PolicyKit GUI agent (optional)..."
-sudo apt install -y policykit-1-gnome
-
-# Install Chrome Remote Desktop
+# Install Chrome Remote Desktop (download with wget for potential speed improvement, and install without download)
 echo "Installing Chrome Remote Desktop..."
-curl -o /tmp/chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb && \
-sudo apt install -y /tmp/chrome-remote-desktop_current_amd64.deb
+wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" && sudo apt install -yqq "./chrome-remote-desktop_current_amd64.deb" && rm "./chrome-remote-desktop_current_amd64.deb"
 
-# Install Google Chrome Stable (using apt to handle dependencies)
+# Install Google Chrome Stable (download with wget, install without download, and remove .deb)
 echo "Installing Google Chrome Stable..."
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-sudo apt install -y ./google-chrome-stable_current_amd64.deb
+wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" && sudo apt install -yqq "./google-chrome-stable_current_amd64.deb" && rm "./google-chrome-stable_current_amd64.deb"
 
-# Install Burp Suite Community Edition
+# Install Burp Suite Community Edition (wget for download, install without downloading, and remove burpsuite)
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
-sudo wget "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && \
-sudo chmod 777 burpsuite && \
-sudo ./burpsuite -q
+wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && sudo chmod +x burpsuite && sudo ./burpsuite -q && rm burpsuite
 
-# End timer and calculate duration
+# End timer
 end_time=$(date +%s)
 duration=$((end_time - start_time))
 
+# Calculate hours, minutes, and seconds
+duration_hours=$((duration_seconds / 3600))
+duration_minutes=$(( (duration_seconds % 3600) / 60 ))
+duration_secs=$((duration_seconds % 60))
+
+# Format the duration output
+if [ $duration_hours -gt 0 ]; then
+  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
+elif [ $duration_minutes -gt 0 ]; then
+  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
+else
+  duration_output="${duration_secs} seconds"
+fi
+
 echo "All commands executed. Please check for any errors above."
-echo "Installation process completed in ${duration} seconds."
+echo "Installation process completed in ${duration_output}."
