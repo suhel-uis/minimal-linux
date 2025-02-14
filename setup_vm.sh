@@ -3,27 +3,25 @@
 # Start timer
 start_time=$(date +%s)
 
-DEFAULT_BURP_VERSION="2024.12.1"  # Default version if fetching fails
+DEFAULT_BURP_VERSION="2024.12.1"
 
-# Use curl to fetch the webpage and grep to find the version number
+# Fetch Burp version (improved error handling)
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
-# Check if version extraction was successful
 if [ -z "${BURP_VERSION_RAW}" ]; then
   echo "Warning: Could not automatically determine the latest Burp Suite version."
-  echo "Falling back to default Burp Suite version: <span class="math-inline">\{DEFAULT\_BURP\_VERSION\}"
-BURP\_VERSION\="</span>{DEFAULT_BURP_VERSION}" # Use default version
+  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
+  BURP_VERSION="${DEFAULT_BURP_VERSION}"
 else
   BURP_VERSION="${BURP_VERSION_RAW}"
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
-# -----------------------------------------------------
 
-# Update package lists (combine commands)
+# Update the packages
 echo "Updating package lists..."
 sudo apt update -yqq # -y for yes to all prompts, -qq for quiet (less verbose)
 
-# Install packages (combine commands and use -yqq)
+# Install packages Gui
 echo "Installing minimal desktop environment and applications..."
 sudo apt install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
 
@@ -41,12 +39,12 @@ wget -q "https://portswigger.net/burp/releases/startdownload?product=community&v
 
 # End timer
 end_time=$(date +%s)
-duration=$((end_time - start_time))
+duration=$((end_time - start_time)) 
 
-# Calculate hours, minutes, and seconds
-duration_hours=$((duration_seconds / 3600))
-duration_minutes=$(( (duration_seconds % 3600) / 60 ))
-duration_secs=$((duration_seconds % 60))
+# Calculate hours, minutes, and seconds (using 'duration' now)
+duration_hours=$((duration / 3600))
+duration_minutes=$(((duration % 3600) / 60))
+duration_secs=$((duration % 60))
 
 # Format the duration output
 if [ $duration_hours -gt 0 ]; then
