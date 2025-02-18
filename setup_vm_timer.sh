@@ -17,6 +17,15 @@ else
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
+# Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
+echo "Downloading installation files in parallel..."
+wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
+wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
+wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O vscode.deb &
+wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
+wait 
+echo "Downloads completed."
+
 # Check if apt-fast is already installed
 if command -v apt-fast &> /dev/null; then
   echo "apt-fast is already installed. Skipping installation."
@@ -45,19 +54,28 @@ sudo ${APT_INSTALL_CMD} update -yqq
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome file-roller gedit
+sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome file-roller
 
-# Install Chrome Remote Desktop (download with wget for potential speed improvement, and install without download)
+# Install code editor (VS Code)
+echo "Installing VS Code..."
+sudo ${APT_INSTALL_CMD} install -yqq ./vscode.deb
+rm vscode.deb
+
+# Install Chrome Remote Desktop
 echo "Installing Chrome Remote Desktop..."
-wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" && sudo apt install -yqq "./chrome-remote-desktop_current_amd64.deb" && rm "./chrome-remote-desktop_current_amd64.deb"
+sudo apt install -yqq "./chrome-remote-desktop_current_amd64.deb"
+rm "./chrome-remote-desktop_current_amd64.deb"
 
-# Install Google Chrome Stable (download with wget, install without download, and remove .deb)
+# Install Google Chrome Stable
 echo "Installing Google Chrome Stable..."
-wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" && sudo apt install -yqq "./google-chrome-stable_current_amd64.deb" && rm "./google-chrome-stable_current_amd64.deb"
+sudo apt install -yqq "./google-chrome-stable_current_amd64.deb"
+rm "./google-chrome-stable_current_amd64.deb"
 
-# Install Burp Suite Community Edition (wget for download, install without downloading, and remove burpsuite)
+# Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
-wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite && sudo chmod +x burpsuite && sudo ./burpsuite -q && rm burpsuite
+sudo chmod +x burpsuite
+sudo ./burpsuite -q
+rm burpsuite
 
 # End timer
 end_time=$(date +%s)
