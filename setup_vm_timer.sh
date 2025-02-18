@@ -17,27 +17,35 @@ else
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
-# Install apt-fast
-echo "Installing apt-fast..."
-sudo add-apt-repository universe -yqq
-sudo apt update -yqq
-sudo apt install apt-fast -yqq
+# Check if apt-fast is already installed
+if command -v apt-fast &> /dev/null; then
+  echo "apt-fast is already installed. Skipping installation."
+  APT_INSTALL_CMD="apt-fast"
+else
+  echo "apt-fast is not installed. Proceeding with installation."
+  # Install apt-fast
+  echo "Installing apt-fast..."
+  sudo add-apt-repository ppa:apt-fast/stable -yqq
+  sudo apt update -yqq 
+  sudo apt install apt-fast -yqq
 
-# Update the packages using apt-fast
-echo "Updating package lists using apt-fast..."
-sudo apt-fast update -yqq
+  # Check again if apt-fast is installed after attempting installation
+  if command -v apt-fast &> /dev/null; then
+    APT_INSTALL_CMD="apt-fast"
+    echo "apt-fast installed successfully. Using apt-fast for package installations."
+  else
+    APT_INSTALL_CMD="apt"
+    echo "apt-fast installation failed. Falling back to using apt for package installations."
+  fi
+fi
 
-# Install packages Gui using apt-fast
-echo "Installing minimal desktop environment and applications using apt-fast..."
-sudo apt-fast install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
+# Update the packages
+echo "Updating package lists..."
+sudo ${APT_INSTALL_CMD} update -yqq
 
-# Install GUI unpack software (File Roller) using apt-fast
-echo "Installing GUI unpack software (File Roller) using apt-fast..."
-sudo apt-fast install -yqq file-roller
-
-# Install code editor gedit using apt-fast
-echo "Install code editor gedit using apt-fast..."
-sudo apt-fast install -yqq gedit
+# Install packages Gui
+echo "Installing minimal desktop environment and applications..."
+sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome file-roller gedit
 
 # Install Chrome Remote Desktop (download with wget for potential speed improvement, and install without download)
 echo "Installing Chrome Remote Desktop..."
