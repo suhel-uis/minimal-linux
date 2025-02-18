@@ -25,7 +25,7 @@ else
   echo "apt-fast is not installed. Proceeding with installation."
   # Install apt-fast
   echo "Installing apt-fast..."
-  sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
+  sudo add-apt-repository ppa:apt-fast/stable -y 2> /dev/null # Suppress add-apt-repository output
   sudo apt update -yqq 2> /dev/null # Suppress apt update output
   sudo apt install apt-fast -yqq 2> /dev/null # Suppress apt install output
 
@@ -43,7 +43,7 @@ fi
 echo "Downloading installation files in parallel..."
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
-wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O vscode.deb &
+wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O -y vscode.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
 
 # Update the packages
@@ -52,7 +52,7 @@ sudo ${APT_INSTALL_CMD} update -yqq
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome file-roller
+sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal jgmenu pcmanfm policykit-1-gnome file-roller
 GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
 
 wait # Wait for all background wget processes to complete
