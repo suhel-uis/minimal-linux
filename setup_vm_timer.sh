@@ -5,33 +5,14 @@ start_time=$(date +%s)
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
 echo "Downloading installation files in parallel..."
-wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
-wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O -yqq vscode.deb &
-wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
 wait # Wait for all background wget processes to complete
 echo "Downloads completed."
 
 # Install code editor (VS Code)
 echo "Installing VS Code..."
-sudo ${APT_INSTALL_CMD} install -yqq ./vscode.deb
+sudo apt-fast install -yqq ./vscode.deb
 rm vscode.deb
-
-# Install Chrome Remote Desktop
-echo "Installing Chrome Remote Desktop..."
-sudo apt install -yqq "./chrome-remote-desktop_current_amd64.deb"
-rm "./chrome-remote-desktop_current_amd64.deb"
-
-# Install Google Chrome Stable
-echo "Installing Google Chrome Stable..."
-sudo apt install -yqq "./google-chrome-stable_current_amd64.deb"
-rm "./google-chrome-stable_current_amd64.deb"
-
-# Install Burp Suite Community Edition
-echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
-sudo chmod +x burpsuite
-sudo ./burpsuite -q
-rm burpsuite
 
 # End timer
 end_time=$(date +%s)
