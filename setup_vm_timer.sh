@@ -9,6 +9,8 @@ wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O -yqq vscode.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
+wait # Wait for all background wget processes to complete
+echo "Downloads completed."
 
 # Install code editor (VS Code)
 echo "Installing VS Code..."
