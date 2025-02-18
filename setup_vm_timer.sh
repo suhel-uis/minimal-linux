@@ -17,15 +17,6 @@ else
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
-# Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
-echo "Downloading installation files in parallel..."
-wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
-wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
-wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O vscode.deb &
-wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
-wait 
-echo "Downloads completed."
-
 # Check if apt-fast is already installed
 if command -v apt-fast &> /dev/null; then
   echo "apt-fast is already installed. Skipping installation."
@@ -48,6 +39,13 @@ else
   fi
 fi
 
+# Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
+echo "Downloading installation files in parallel..."
+wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
+wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
+wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O vscode.deb &
+wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
+
 # Update the packages
 echo "Updating package lists..."
 sudo ${APT_INSTALL_CMD} update -yqq
@@ -55,6 +53,13 @@ sudo ${APT_INSTALL_CMD} update -yqq
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
 sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome file-roller
+GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
+
+wait # Wait for all background wget processes to complete
+echo "Downloads completed."
+
+wait $GUI_INSTALL_PID # Wait for the GUI installation to complete
+echo "GUI installation completed."
 
 # Install code editor (VS Code)
 echo "Installing VS Code..."
