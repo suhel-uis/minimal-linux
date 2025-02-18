@@ -11,7 +11,7 @@ echo "Downloads completed."
 
 # Install code editor (VS Code)
 echo "Installing VS Code..."
-sudo apt-fast install -yqq ./vscode.deb
+sudo apt install -yqq ./vscode.deb
 rm vscode.deb
 
 # End timer
