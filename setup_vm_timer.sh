@@ -52,7 +52,7 @@ sudo ${APT_INSTALL_CMD} update -yqq
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal jgmenu pcmanfm policykit-1-gnome file-roller
+sudo ${APT_INSTALL_CMD} install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome file-roller
 GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
 
 wait # Wait for all background wget processes to complete
