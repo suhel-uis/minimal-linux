@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Start timer
@@ -20,11 +19,19 @@ fi
 
 # Update the packages
 echo "Updating package lists..."
-sudo apt update -yqq # -y for yes to all prompts, -qq for quiet (less verbose)
+sudo apt update -yqq
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
 sudo apt install -yqq xorg openbox lxterminal network-manager-gnome jgmenu pcmanfm policykit-1-gnome
+
+# Install GUI unpack software (File Roller)
+echo "Installing GUI unpack software (File Roller)..."
+sudo apt install -yqq file-roller
+
+# Install code editor gedit
+echo "Install code editor gedit..."
+sudo apt install -yqq gedit
 
 # Install Chrome Remote Desktop (download with wget for potential speed improvement, and install without download)
 echo "Installing Chrome Remote Desktop..."
