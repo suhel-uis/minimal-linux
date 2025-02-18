@@ -17,10 +17,10 @@ else
     echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
-# **Install apt-fast (for multple download from the same server)**
+# **Install apt-fast (with PPA)**
 if ! command -v apt-fast &> /dev/null
 then
-    echo "Apt-fast is not installed. Installing..."
+    echo "Apt-fast não está instalado. A instalar..."
     sudo add-apt-repository ppa:apt-fast/stable -y
     sudo apt update -yqq
     sudo apt install -yqq apt-fast
@@ -42,15 +42,15 @@ sudo apt-fast install -yqq file-roller
 echo "Install code editor gedit using apt-fast..."
 sudo apt-fast install -yqq gedit
 
-# **Parallel downloads with wget e xargs**
+# **Downloads paralelos with wget and xargs (Debugging wget -O)**
 declare -a download_urls=(
     "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb"
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
     "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux"
 )
 
-echo "Downloading Chrome Remote Desktop, Google Chrome Stable and Burp Suite in parallel (testing wget -O)..."
-printf "%s\n" "${download_urls[@]}" | xargs -P 3 -I {} bash -c 'wget -q {} -O testfile'
+echo "Debugging wget -O in parallel downloads..."
+printf "%s\n" "${download_urls[@]}" | xargs -P 3 -I {} bash -c 'echo "Executing: /usr/bin/wget -q \\"{}\\" -O \\"testfile\\""; /usr/bin/wget -q "{}" -O "testfile"' # Debugging command
 
 # Install Chrome Remote Desktop
 echo "Installing Chrome Remote Desktop..."
@@ -62,7 +62,7 @@ sudo apt install -yqq "./google-chrome-stable_current_amd64.deb" && rm "./google
 
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
-sudo chmod +x burpsuite && sudo ./burpsuite -q && rm burpsuite
+sudo chmod +x testfile && sudo ./testfile -q && rm testfile # Using testfile for Burp Suite for now
 
 # End timer
 end_time=$(date +%s)
