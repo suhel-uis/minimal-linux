@@ -25,9 +25,9 @@ else
   echo "apt-fast is not installed. Proceeding with installation."
   # Install apt-fast
   echo "Installing apt-fast..."
-  sudo add-apt-repository ppa:apt-fast/stable -yqq
-  sudo apt update -yqq 
-  sudo apt install apt-fast -yqq
+  sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
+  sudo apt update -yqq 2> /dev/null # Suppress apt update output
+  sudo apt install apt-fast -yqq 2> /dev/null # Suppress apt install output
 
   # Check again if apt-fast is installed after attempting installation
   if command -v apt-fast &> /dev/null; then
