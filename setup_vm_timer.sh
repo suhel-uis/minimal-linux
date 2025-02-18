@@ -1,18 +1,41 @@
+
 #!/bin/bash
 
 # Start timer
 start_time=$(date +%s)
 
-# Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
-echo "Downloading installation files in parallel..."
-wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O -yqq vscode.deb &
-wait # Wait for all background wget processes to complete
-echo "Downloads completed."
+# Check if apt-fast is already installed
+if command -v apt-fast &> /dev/null; then
+  echo "apt-fast is already installed. Skipping installation."
+  APT_INSTALL_CMD="apt-fast"
+else
+  echo "apt-fast is not installed. Proceeding with installation."
+  # Install apt-fast
+  echo "Installing apt-fast..."
+  sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
+  sudo apt update -yqq 2> /dev/null # Suppress apt update output
+  sudo apt install apt-fast -yqq 2> /dev/null # Suppress apt install output
 
-# Install code editor (VS Code)
-echo "Installing VS Code..."
-sudo apt install -yqq ./vscode.deb
-rm vscode.deb
+  # Check again if apt-fast is installed after attempting installation
+  if command -v apt-fast &> /dev/null; then
+    APT_INSTALL_CMD="apt-fast"
+    echo "apt-fast installed successfully. Using apt-fast for package installations."
+  else
+    APT_INSTALL_CMD="apt"
+    echo "apt-fast installation failed. Falling back to using apt for package installations."
+  fi
+fi
+
+# Update the packages
+echo "Updating package lists..."
+sudo ${APT_INSTALL_CMD} update -yqq
+
+# Install packages Gui
+echo "Installing minimal desktop environment and applications..."
+sudo ${APT_INSTALL_CMD} install software-properties-common apt-transport-https wget -y
+sudo ${APT_INSTALL_CMD} install -yqq sublime-text
+wait # Wait for the GUI installation to complete
+echo "GUI installation completed."
 
 # End timer
 end_time=$(date +%s)
