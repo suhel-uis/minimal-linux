@@ -40,11 +40,14 @@ else
   fi
 fi
 
+# Update the packages
+echo "Updating package lists..."
+sudo ${APT_INSTALL_CMD} update -yqq
+
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
 echo "Downloading installation files in parallel..."
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
-wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O -yqq vscode.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
 wait # Wait for all background wget processes to complete
 echo "Downloads completed."
@@ -59,24 +62,16 @@ echo "Installing Chrome Remote Desktop..."
 sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
 rm "./chrome-remote-desktop_current_amd64.deb"
 
-# Install code editor (VS Code)
-echo "Installing VS Code..."
-sudo ${APT_INSTALL_CMD} install -yqq ./vscode.deb
-rm vscode.deb
-
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
 sudo chmod +x burpsuite
 sudo ./burpsuite -q
 rm burpsuite
 
-# Update the packages
-echo "Updating package lists..."
-sudo ${APT_INSTALL_CMD} update -yqq
-
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager
+sudo ${APT_INSTALL_CMD} install software-properties-common apt-transport-https wget -y
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager sublime-text
 wait # Wait for the GUI installation to complete
 echo "GUI installation completed."
 
