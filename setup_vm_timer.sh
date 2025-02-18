@@ -20,7 +20,8 @@ fi
 # **Install apt-fast (for multple download from the same server)**
 if ! command -v apt-fast &> /dev/null
 then
-    echo "Apt-fast is not installed. A instalar..."
+    echo "Apt-fast is not installed. Installing..."
+    sudo add-apt-repository ppa:apt-fast/stable -y
     sudo apt update -yqq
     sudo apt install -yqq apt-fast
 fi
@@ -48,14 +49,8 @@ declare -a download_urls=(
     "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux"
 )
 
-declare -a output_files=(
-    "chrome-remote-desktop_current_amd64.deb"
-    "google-chrome-stable_current_amd64.deb"
-    "burpsuite"
-)
-
-echo "Downloading Chrome Remote Desktop, Google Chrome Stable and Burp Suite in parallel..."
-printf "%s\n" "${download_urls[@]}" | xargs -P 3 -I {} bash -c 'wget -q {} -O $(basename {})'
+echo "Downloading Chrome Remote Desktop, Google Chrome Stable and Burp Suite in parallel (testing wget -O)..."
+printf "%s\n" "${download_urls[@]}" | xargs -P 3 -I {} bash -c 'wget -q {} -O testfile'
 
 # Install Chrome Remote Desktop
 echo "Installing Chrome Remote Desktop..."
