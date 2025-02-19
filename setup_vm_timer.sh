@@ -20,7 +20,7 @@ fi
 
 # Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
-sudo add-apt-repository ppa:apt-fast/stable -yqq
+sudo add-apt-repository ppa:apt-fast/stable -y
 sudo apt update -yqq
 sudo apt install apt-fast -yqq 
 
