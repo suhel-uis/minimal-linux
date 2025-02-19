@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Start timer
@@ -20,9 +19,12 @@ fi
 
 # Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
-sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
-sudo apt update -yqq 2> /dev/null # Suppress apt update output
-sudo apt install apt-fast -yqq 2> /dev/null # Suppress apt install output
+sudo add-apt-repository ppa:apt-fast/stable -y
+sudo apt update -yqq
+echo debconf apt-fast/maxdownloads string 16 | sudo debconf-set-selections
+echo debconf apt-fast/dlflag boolean true | sudo debconf-set-selections
+echo debconf apt-fast/aptmanager string apt-get | sudo debconf-set-selections
+sudo apt install apt-fast -yqq
 
 # Check again if apt-fast is installed after attempting installation
 if command -v apt-fast &> /dev/null; then
