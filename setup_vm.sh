@@ -43,6 +43,12 @@ wget -q "https://portswigger.net/burp/releases/startdownload?product=community&v
 wait # Wait for all background wget processes to complete
 echo "Downloads completed."
 
+# Install packages Gui
+echo "Installing minimal desktop environment and applications..."
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager
+wait # Wait for the GUI installation to complete
+echo "GUI installation completed."
+
 # Install Google Chrome Stable
 echo "Installing Google Chrome Stable..."
 sudo ${APT_INSTALL_CMD} install -yqq "./google-chrome-stable_current_amd64.deb"
@@ -58,12 +64,6 @@ echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
 sudo chmod +x burpsuite
 sudo ./burpsuite -q
 rm burpsuite
-
-# Install packages Gui
-echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager
-wait # Wait for the GUI installation to complete
-echo "GUI installation completed."
 
 # Install VsCode
 echo "Installing VsCode..."
