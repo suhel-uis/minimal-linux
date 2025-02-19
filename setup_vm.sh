@@ -18,26 +18,19 @@ else
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
-# Check if apt-fast is already installed
-if command -v apt-fast &> /dev/null; then
-  echo "apt-fast is already installed. Skipping installation."
-  APT_INSTALL_CMD="apt-fast"
-else
-  echo "apt-fast is not installed. Proceeding with installation."
-  # Install apt-fast
-  echo "Installing apt-fast..."
-  sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
-  sudo apt update -yqq 2> /dev/null # Suppress apt update output
-  sudo apt install apt-fast -yqq 2> /dev/null # Suppress apt install output
+# Install apt-fast
+echo "Installing apt-fast..."
+sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
+sudo apt update -yqq 2> /dev/null # Suppress apt update output
+sudo apt install apt-fast -yqq 2> /dev/null # Suppress apt install output
 
-  # Check again if apt-fast is installed after attempting installation
-  if command -v apt-fast &> /dev/null; then
-    APT_INSTALL_CMD="apt-fast"
-    echo "apt-fast installed successfully. Using apt-fast for package installations."
-  else
-    APT_INSTALL_CMD="apt"
-    echo "apt-fast installation failed. Falling back to using apt for package installations."
-  fi
+# Check again if apt-fast is installed after attempting installation
+if command -v apt-fast &> /dev/null; then
+  APT_INSTALL_CMD="apt-fast"
+  echo "apt-fast installed successfully. Using apt-fast for package installations."
+ else
+  APT_INSTALL_CMD="apt"
+  echo "apt-fast installation failed. Falling back to using apt for package installations."
 fi
 
 # Update the packages
