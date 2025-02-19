@@ -18,7 +18,7 @@ else
   echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
-# Install apt-fast
+# Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
 sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
 sudo apt update -yqq 2> /dev/null # Suppress apt update output
@@ -32,10 +32,6 @@ if command -v apt-fast &> /dev/null; then
   APT_INSTALL_CMD="apt"
   echo "apt-fast installation failed. Falling back to using apt for package installations."
 fi
-
-# Update the packages
-echo "Updating package lists..."
-sudo ${APT_INSTALL_CMD} update -yqq
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
 echo "Downloading installation files in parallel..."
