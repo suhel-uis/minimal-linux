@@ -20,9 +20,9 @@ fi
 
 # Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
-sudo add-apt-repository ppa:apt-fast/stable -yqq 2> /dev/null # Suppress add-apt-repository output
-sudo apt update -yqq 2> /dev/null # Suppress apt update output
-sudo apt install apt-fast -y
+sudo add-apt-repository ppa:apt-fast/stable -yqq 2
+sudo apt update -yqq
+sudo apt install apt-fast -yqq
 
 # Check again if apt-fast is installed after attempting installation
 if command -v apt-fast &> /dev/null; then
