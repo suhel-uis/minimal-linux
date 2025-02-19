@@ -4,16 +4,11 @@
 # Start timer
 start_time=$(date +%s)
 
-# Update the packages
-echo "Updating package lists..."
-sudo apt update -yqq
-
-# Install packages Gui
-echo "Installing minimal desktop environment and applications..."
-sudo apt install software-properties-common apt-transport-https wget -y
-sudo apt install -yqq sublime-text
-wait # Wait for the GUI installation to complete
-echo "GUI installation completed."
+# Install VsCode
+echo "Installing VsCode..."
+sudo snap install --classic code
+wait # Wait for the VsCode installation to complete
+echo "VsCode installation completed."
 
 # End timer
 end_time=$(date +%s)
