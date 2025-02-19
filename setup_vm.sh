@@ -70,10 +70,15 @@ rm burpsuite
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install software-properties-common apt-transport-https wget -y
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager sublime-text
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager
 wait # Wait for the GUI installation to complete
 echo "GUI installation completed."
+
+# Install VsCode
+echo "Installing VsCode..."
+sudo snap install --classic code
+wait # Wait for the VsCode installation to complete
+echo "VsCode installation completed."
 
 # End timer
 end_time=$(date +%s)
