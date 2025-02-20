@@ -40,13 +40,16 @@ echo "Downloading installation files in parallel..."
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
-wait # Wait for all background wget processes to complete
-echo "Downloads completed."
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
 sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager
-wait # Wait for the GUI installation to complete
+GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
+
+wait # Wait for all background wget processes to complete
+echo "Downloads completed."
+
+wait $GUI_INSTALL_PID # Wait for the GUI installation to complete
 echo "GUI installation completed."
 
 # Install Google Chrome Stable
