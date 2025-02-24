@@ -47,7 +47,7 @@ wget -q "https://portswigger.net/burp/releases/startdownload?product=community&v
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
+sudo ${APT_INSTALL_CMD} install -yqq network-manager file-roller
 GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
 
 wait # Wait for all background wget processes to complete
