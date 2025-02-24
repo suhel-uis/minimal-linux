@@ -6,13 +6,14 @@ start_time=$(date +%s)
 DEFAULT_BURP_VERSION="2025.1.1"
 
 # Read Chrome Remote Desktop code from command line argument
-if [ -z "$1" ]; then
-  echo "Error: Chrome Remote Desktop code is missing."
-  echo "Usage: ./script.sh <code>"
-  exit 1
-fi
 CHROME_REMOTE_DESKTOP_CODE="$1"
-shift # Remove the first argument so that other parts of the script are not affected if they were to use arguments
+shift
+
+if [ -z "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
+  echo "Warning: Chrome Remote Desktop code not provided. Chrome Remote Desktop setup will be skipped."
+else
+  echo "Chrome Remote Desktop code provided."
+fi
 
 # Fetch Burp version (improved error handling)
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
@@ -83,10 +84,14 @@ sudo snap install --classic code
 wait # Wait for the VsCode installation to complete
 echo "VsCode installation completed."
 
-# Start Chrome Remote Desktop host
-echo "Starting Chrome Remote Desktop..."
-DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
-echo "Chrome Remote Desktop started."
+# Start Chrome Remote Desktop host if code is provided
+if [ -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
+  echo "Starting Chrome Remote Desktop..."
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
+  echo "Chrome Remote Desktop started."
+else
+  echo "Chrome Remote Desktop start skipped because code was not provided."
+fi
 
 # End timer
 end_time=$(date +%s)
