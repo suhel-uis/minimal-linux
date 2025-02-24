@@ -7,27 +7,21 @@ DEFAULT_BURP_VERSION="2025.1.1"
 
 # Read Chrome Remote Desktop code from command line argument
 CHROME_REMOTE_DESKTOP_CODE="$1"
-shift # Remove the first argument so that other parts of the script are not affected if they were to use arguments
-
-if [ -z "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
-  echo "Warning: Chrome Remote Desktop code not provided. Chrome Remote Desktop setup will be skipped."
-else
-  echo "Chrome Remote Desktop code provided."
-fi
+shift
 
 # Fetch Burp version (improved error handling)
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
 if [ -z "${BURP_VERSION_RAW}" ]; then
-  echo "Warning: Could not automatically determine the latest Burp Suite version."
-  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
-  BURP_VERSION="${DEFAULT_BURP_VERSION}"
+  echo "Warning: Could not automatically determine the latest Burp Suite version."
+  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
+  BURP_VERSION="${DEFAULT_BURP_VERSION}"
 else
-  BURP_VERSION="${BURP_VERSION_RAW}"
-  echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
+  BURP_VERSION="${BURP_VERSION_RAW}"
+  echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
-# Update the packages lists and install apt-fast (podes mover para fora do script principal se quiseres pré-atualizar o sistema)
+# Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
 sudo add-apt-repository ppa:apt-fast/stable -y
 sudo apt update -yqq
@@ -38,11 +32,11 @@ sudo apt install apt-fast -yqq
 
 # Check again if apt-fast is installed after attempting installation
 if command -v apt-fast &> /dev/null; then
-  APT_INSTALL_CMD="apt-fast"
-  echo "apt-fast installed successfully. Using apt-fast for package installations."
- else
-  APT_INSTALL_CMD="apt"
-  echo "apt-fast installation failed. Falling back to using apt for package installations."
+  APT_INSTALL_CMD="apt-fast"
+  echo "apt-fast installed successfully. Using apt-fast for package installations."
+ else
+  APT_INSTALL_CMD="apt"
+  echo "apt-fast installation failed. Falling back to using apt for package installations."
 fi
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
@@ -104,11 +98,11 @@ duration_secs=$((duration % 60))
 
 # Format the duration output
 if [ $duration_hours -gt 0 ]; then
-  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
+  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
 elif [ $duration_minutes -gt 0 ]; then
-  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
+  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
 else
-  duration_output="${duration_secs} seconds"
+  duration_output="${duration_secs} seconds"
 fi
 
 echo "All commands executed. Please check for any errors above."
