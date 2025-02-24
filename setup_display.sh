@@ -7,7 +7,7 @@ DEFAULT_BURP_VERSION="2025.1.1"
 
 # Read Chrome Remote Desktop code from command line argument
 CHROME_REMOTE_DESKTOP_CODE="$1"
-shift
+shift # Remove the first argument so that other parts of the script are not affected if they were to use arguments
 
 if [ -z "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Warning: Chrome Remote Desktop code not provided. Chrome Remote Desktop setup will be skipped."
@@ -53,7 +53,7 @@ wget -q "https://portswigger.net/burp/releases/startdownload?product=community&v
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq network-manager file-roller
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
 GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
 
 wait # Wait for all background wget processes to complete
