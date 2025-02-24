@@ -81,7 +81,7 @@ echo "VsCode installation completed."
 # Start Chrome Remote Desktop host if code is provided
 if [ -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
-  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name=$(whoami)
   echo "Chrome Remote Desktop started."
 else
   echo "Chrome Remote Desktop start skipped because code was not provided."
