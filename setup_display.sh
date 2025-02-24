@@ -5,6 +5,15 @@ start_time=$(date +%s)
 
 DEFAULT_BURP_VERSION="2025.1.1"
 
+# Read Chrome Remote Desktop code from command line argument
+if [ -z "$1" ]; then
+  echo "Error: Chrome Remote Desktop code is missing."
+  echo "Usage: ./script.sh <code>"
+  exit 1
+fi
+CHROME_REMOTE_DESKTOP_CODE="$1"
+shift # Remove the first argument so that other parts of the script are not affected if they were to use arguments
+
 # Fetch Burp version (improved error handling)
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
@@ -43,7 +52,7 @@ wget -q "https://portswigger.net/burp/releases/startdownload?product=community&v
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
+sudo ${APT_INSTALL_CMD} install -yqq network-manager file-roller
 GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
 
 wait # Wait for all background wget processes to complete
@@ -73,6 +82,11 @@ echo "Installing VsCode..."
 sudo snap install --classic code
 wait # Wait for the VsCode installation to complete
 echo "VsCode installation completed."
+
+# Start Chrome Remote Desktop host
+echo "Starting Chrome Remote Desktop..."
+DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
+echo "Chrome Remote Desktop started."
 
 # End timer
 end_time=$(date +%s)
