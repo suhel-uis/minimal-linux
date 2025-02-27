@@ -6,6 +6,7 @@ start_time=$(date +%s)
 # Read Chrome Remote Desktop code from command line argument
 CHROME_ROMETE_USER_NAME="$1"
 CHROME_REMOTE_DESKTOP_CODE="$2"
+PRE_CONFIGURED_PIN="123456"
 shift
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
@@ -24,8 +25,8 @@ rm "./chrome-remote-desktop_current_amd64.deb"
 if [ -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
   # Run start-host as the current user, not as root directly
-  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}"
-else
+     DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  else
   echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
 
