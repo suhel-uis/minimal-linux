@@ -46,7 +46,7 @@ echo "Downloading installation files in parallel..."
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
-wait # Wait for all background wget processes to complete
+wait
 echo "Downloads completed."
 
 # Install Google Chrome Stable
@@ -63,7 +63,7 @@ rm "./chrome-remote-desktop_current_amd64.deb"
 if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
   # Run start-host as the current user, not as root directly
-     DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
   echo "Finish Starting Chrome Remote Desktop"
   else
   echo "Chrome Remote Desktop start skipped because code was not provided."
@@ -72,9 +72,7 @@ fi
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
 sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
-GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
-
-wait $GUI_INSTALL_PID # Wait for the GUI installation to complete
+wait
 echo "GUI installation completed."
 
 # Install Burp Suite Community Edition
@@ -86,7 +84,7 @@ rm burpsuite
 # Install VsCode
 echo "Installing VsCode..."
 sudo snap install --classic code
-wait # Wait for the VsCode installation to complete
+wait
 echo "VsCode installation completed."
 
 # End timer
