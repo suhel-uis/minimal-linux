@@ -93,8 +93,7 @@ sudo dpkg-reconfigure --frontend noninteractive gdm3
 
 # Set default desktop environment for the current user
 echo "Setting default desktop environment for user ${CHROME_REMOTE_USER_NAME}..."
-sudo sed -i 's|^Session=.*|Session=ubuntu|' /var/lib/AccountsService/users/${CHROME_REMOTE_USER_NAME}
-sudo dpkg-reconfigure --frontend noninteractive gdm3
+sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
 
 # End timer
 end_time=$(date +%s)
