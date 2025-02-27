@@ -15,12 +15,12 @@ DEFAULT_BURP_VERSION="2025.1.1"
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
 if [ -z "${BURP_VERSION_RAW}" ]; then
-  echo "Warning: Could not automatically determine the latest Burp Suite version."
-  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
-  BURP_VERSION="${DEFAULT_BURP_VERSION}"
+    echo "Warning: Could not automatically determine the latest Burp Suite version."
+    echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
+    BURP_VERSION="${DEFAULT_BURP_VERSION}"
 else
-  BURP_VERSION="${BURP_VERSION_RAW}"
-  echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
+    BURP_VERSION="${BURP_VERSION_RAW}"
+    echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
 fi
 
 # Update the packages lists and install apt-fast
@@ -34,11 +34,11 @@ sudo apt install apt-fast -yqq
 
 # Check again if apt-fast is installed after attempting installation
 if command -v apt-fast &> /dev/null; then
-  APT_INSTALL_CMD="apt-fast"
-  echo "apt-fast installed successfully. Using apt-fast for package installations."
- else
-  APT_INSTALL_CMD="apt"
-  echo "apt-fast installation failed. Falling back to using apt for package installations."
+    APT_INSTALL_CMD="apt-fast"
+    echo "apt-fast installed successfully. Using apt-fast for package installations."
+else
+    APT_INSTALL_CMD="apt"
+    echo "apt-fast installation failed. Falling back to using apt for package installations."
 fi
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
@@ -61,19 +61,25 @@ rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Start Chrome Remote Desktop host if code is provided
 if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
-  echo "Starting Chrome Remote Desktop..."
-  # Run start-host as the current user, not as root directly
-  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
-  echo "Finish Starting Chrome Remote Desktop"
-  else
-  echo "Chrome Remote Desktop start skipped because code was not provided."
+    echo "Starting Chrome Remote Desktop..."
+    # Run start-host as the current user, not as root directly
+    DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+    echo "Finish Starting Chrome Remote Desktop"
+else
+    echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller lightdm
 wait
 echo "GUI installation completed."
+
+# Configure display manager and desktop session
+echo "Configuring display manager and desktop session..."
+sudo dpkg-reconfigure lightdm
+sudo sed -i 's/^user-session=default$/user-session=ubuntu/' /etc/chrome-remote-desktop-session
+echo "Display manager and desktop session configured."
 
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
@@ -98,11 +104,11 @@ duration_secs=$((duration % 60))
 
 # Format the duration output
 if [ $duration_hours -gt 0 ]; then
-  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
+    duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
 elif [ $duration_minutes -gt 0 ]; then
-  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
+    duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
 else
-  duration_output="${duration_secs} seconds"
+    duration_output="${duration_secs} seconds"
 fi
 
 echo "All commands executed. Please check for any errors above."
