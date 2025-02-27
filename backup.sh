@@ -1,11 +1,10 @@
-
 #!/bin/bash
 
 # Start timer
 start_time=$(date +%s)
 
 # Read Chrome Remote Desktop code from command line argument
-CHROME_REMOTE_USER_NAME="$1"
+CHROME_ROMETE_USER_NAME="$1"
 CHROME_REMOTE_DESKTOP_CODE="$2"
 PRE_CONFIGURED_PIN="123456"
 shift
@@ -62,13 +61,31 @@ rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Start Chrome Remote Desktop host if code is provided
 if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
-  echo "Starting Chrome Remote Desktop..."
-  # Run start-host as the current user, not as root directly
-  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
-  echo "Finish Starting Chrome Remote Desktop"
-else
-  echo "Chrome Remote Desktop start skipped because code was not provided."
+  echo "Starting Chrome Remote Desktop..."
+  # Run start-host as the current user, not as root directly
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  echo "Finish Starting Chrome Remote Desktop"
+  else
+  echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
+
+# Install packages Gui
+echo "Installing minimal desktop environment and applications..."
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
+wait
+echo "GUI installation completed."
+
+# Install Burp Suite Community Edition
+echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
+sudo chmod +x burpsuite
+sudo ./burpsuite -q
+rm burpsuite
+
+# Install VsCode
+echo "Installing VsCode..."
+sudo snap install --classic code
+wait
+echo "VsCode installation completed."
 
 # End timer
 end_time=$(date +%s)
@@ -81,11 +98,11 @@ duration_secs=$((duration % 60))
 
 # Format the duration output
 if [ $duration_hours -gt 0 ]; then
-  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
+  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
 elif [ $duration_minutes -gt 0 ]; then
-  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
+  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
 else
-  duration_output="${duration_secs} seconds"
+  duration_output="${duration_secs} seconds"
 fi
 
 echo "All commands executed. Please check for any errors above."
