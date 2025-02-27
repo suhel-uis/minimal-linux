@@ -4,8 +4,8 @@
 start_time=$(date +%s)
 
 # Read Chrome Remote Desktop code from command line argument
-CHROME_REMOTE_DESKTOP_CODE="$1"
-CHROME_ROMETE_USER_NAME="$2"
+CHROME_ROMETE_USER_NAME="$1"
+CHROME_REMOTE_DESKTOP_CODE="$2"
 shift
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
