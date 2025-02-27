@@ -60,7 +60,7 @@ sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
 rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Start Chrome Remote Desktop host if code is provided
-if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
+if [ -n "${CHROME_REMOTE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
   # Run start-host as the current user, not as root directly
   DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
@@ -94,6 +94,7 @@ sudo dpkg-reconfigure --frontend noninteractive gdm3
 # Set default desktop environment for the current user
 echo "Setting default desktop environment for user ${CHROME_REMOTE_USER_NAME}..."
 sudo sed -i 's|^Session=.*|Session=ubuntu|' /var/lib/AccountsService/users/${CHROME_REMOTE_USER_NAME}
+sudo systemctl restart gdm3
 
 # End timer
 end_time=$(date +%s)
