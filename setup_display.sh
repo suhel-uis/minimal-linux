@@ -47,6 +47,26 @@ wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
 
+# Install Google Chrome Stable
+echo "Installing Google Chrome Stable..."
+sudo ${APT_INSTALL_CMD} install -yqq "./google-chrome-stable_current_amd64.deb"
+rm "./google-chrome-stable_current_amd64.deb"
+
+# Install Chrome Remote Desktop
+echo "Installing Chrome Remote Desktop..."
+sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
+rm "./chrome-remote-desktop_current_amd64.deb"
+
+# Start Chrome Remote Desktop host if code is provided
+if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
+  echo "Starting Chrome Remote Desktop..."
+  # Run start-host as the current user, not as root directly
+     DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  echo "Finish Starting Chrome Remote Desktop"
+  else
+  echo "Chrome Remote Desktop start skipped because code was not provided."
+fi
+
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
 sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
@@ -57,16 +77,6 @@ echo "Downloads completed."
 
 wait $GUI_INSTALL_PID # Wait for the GUI installation to complete
 echo "GUI installation completed."
-
-# Install Google Chrome Stable
-echo "Installing Google Chrome Stable..."
-sudo ${APT_INSTALL_CMD} install -yqq "./google-chrome-stable_current_amd64.deb"
-rm "./google-chrome-stable_current_amd64.deb"
-
-# Install Chrome Remote Desktop
-echo "Installing Chrome Remote Desktop..."
-sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
-rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
@@ -79,16 +89,6 @@ echo "Installing VsCode..."
 sudo snap install --classic code
 wait # Wait for the VsCode installation to complete
 echo "VsCode installation completed."
-
-# Start Chrome Remote Desktop host if code is provided
-if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
-  echo "Starting Chrome Remote Desktop..."
-  # Run start-host as the current user, not as root directly
-     DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
-  echo "Finish Starting Chrome Remote Desktop"
-  else
-  echo "Chrome Remote Desktop start skipped because code was not provided."
-fi
 
 # End timer
 end_time=$(date +%s)
