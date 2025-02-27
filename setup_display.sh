@@ -23,8 +23,7 @@ rm "./chrome-remote-desktop_current_amd64.deb"
 if [ -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
   # Run start-host as the current user, not as root directly
-  sudo -u $(whoami) DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
-  echo "Chrome Remote Desktop started."
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name=pimentelmota
 else
   echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
