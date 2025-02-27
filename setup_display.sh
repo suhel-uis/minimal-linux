@@ -69,8 +69,8 @@ else
     echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
 
-# Install packages Gui
-echo "Installing minimal desktop environment and applications..."
+# Install packages Gui - Full Ubuntu Desktop
+echo "Installing full Ubuntu desktop environment and applications..."
 sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller lightdm
 wait
 echo "GUI installation completed."
@@ -78,8 +78,16 @@ echo "GUI installation completed."
 # Configure display manager and desktop session
 echo "Configuring display manager and desktop session..."
 sudo dpkg-reconfigure lightdm
-sudo sed -i 's/^user-session=default$/user-session=ubuntu/' /etc/chrome-remote-desktop-session
+# Explicitly set default session in lightdm config
+sudo sed -i 's/^\[SeatDefaults\]/\[SeatDefaults\]\nuser-session=ubuntu/' /etc/lightdm/lightdm.conf
+sudo sed -i 's/^user-session=default$/#user-session=default/' /etc/chrome-remote-desktop-session
+sudo sed -i 's/^user-session=ubuntu$/user-session=ubuntu/' /etc/chrome-remote-desktop-session
 echo "Display manager and desktop session configured."
+
+# Restart lightdm service
+echo "Restarting lightdm service..."
+sudo systemctl restart lightdm
+echo "lightdm service restarted."
 
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
