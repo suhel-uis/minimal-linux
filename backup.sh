@@ -69,24 +69,6 @@ if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; th
   echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
 
-# Install packages Gui
-echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
-wait
-echo "GUI installation completed."
-
-# Install Burp Suite Community Edition
-echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
-sudo chmod +x burpsuite
-sudo ./burpsuite -q
-rm burpsuite
-
-# Install VsCode
-echo "Installing VsCode..."
-sudo snap install --classic code
-wait
-echo "VsCode installation completed."
-
 # End timer
 end_time=$(date +%s)
 duration=$((end_time - start_time))
