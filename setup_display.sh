@@ -61,27 +61,19 @@ rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Start Chrome Remote Desktop host if code is provided
 if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
-  echo "Starting Chrome Remote Desktop..."
-  # Run start-host as the current user, not as root directly
-  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
-  echo "Finish Starting Chrome Remote Desktop"
-else
-  echo "Chrome Remote Desktop start skipped because code was not provided."
+  echo "Starting Chrome Remote Desktop..."
+  # Run start-host as the current user, not as root directly
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  echo "Finish Starting Chrome Remote Desktop"
+  else
+  echo "Chrome Remote Desktop start skipped because code was not provided."
 fi
 
-# Install packages Gui - Full Ubuntu Desktop
-echo "Installing full Ubuntu desktop environment and applications..."
+# Install packages Gui
+echo "Installing minimal desktop environment and applications..."
 sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
 wait
 echo "GUI installation completed."
-
-# Set default display manager to gdm3
-echo "Setting default display manager to gdm3..."
-sudo dpkg-reconfigure --frontend noninteractive gdm3
-
-# Set default desktop environment for the current user
-echo "Setting default desktop environment for user ${CHROME_REMOTE_USER_NAME}..."
-sudo sed -i 's|^Session=.*|Session=ubuntu|' /var/lib/AccountsService/users/${CHROME_REMOTE_USER_NAME}
 
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
@@ -95,6 +87,14 @@ sudo snap install --classic code
 wait
 echo "VsCode installation completed."
 
+# Set default display manager to gdm3
+echo "Setting default display manager to gdm3..."
+sudo dpkg-reconfigure --frontend noninteractive gdm3
+
+# Set default desktop environment for the current user
+echo "Setting default desktop environment for user ${CHROME_REMOTE_USER_NAME}..."
+sudo sed -i 's|^Session=.*|Session=ubuntu|' /var/lib/AccountsService/users/${CHROME_REMOTE_USER_NAME}
+
 # End timer
 end_time=$(date +%s)
 duration=$((end_time - start_time))
@@ -106,13 +106,12 @@ duration_secs=$((duration % 60))
 
 # Format the duration output
 if [ $duration_hours -gt 0 ]; then
-  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
+  duration_output="${duration_hours} hours, ${duration_minutes} minutes, ${duration_secs} seconds"
 elif [ $duration_minutes -gt 0 ]; then
-  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
+  duration_output="${duration_minutes} minutes, ${duration_secs} seconds"
 else
-  duration_output="${duration_secs} seconds"
+  duration_output="${duration_secs} seconds"
 fi
 
 echo "All commands executed. Please check for any errors above."
 echo "Installation process completed in ${duration_output}."
-echo "System reboot required for GUI changes to take effect. Please reboot your system."
