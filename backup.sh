@@ -4,11 +4,14 @@
 start_time=$(date +%s)
 
 # Read Chrome Remote Desktop code from command line argument
-CHROME_REMOTE_USER_NAME="$1"
-CHROME_REMOTE_DESKTOP_CODE="$2"
-PRE_CONFIGURED_PIN="123456"
+CHROME_REMOTE_DESKTOP_CODE="$1"
 shift
 
+# Get the user name and remote desktop default pin
+CHROME_REMOTE_USER_NAME="${SUDO_USER}"
+PRE_CONFIGURED_PIN="123456"
+
+# Default burpsuit version
 DEFAULT_BURP_VERSION="2025.1.1"
 
 # Fetch Burp version (improved error handling)
