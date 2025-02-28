@@ -60,9 +60,9 @@ sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
 rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Start Chrome Remote Desktop host if code is provided
+DISPLAY_INSTALL_STATUS=0
 if [ -n "${CHROME_REMOTE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
-  DISPLAY_INSTALL_STATUS=0
   DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
   DISPLAY_INSTALL_STATUS=$?
   wait
