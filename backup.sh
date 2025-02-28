@@ -4,7 +4,7 @@
 start_time=$(date +%s)
 
 # Read Chrome Remote Desktop code from command line argument
-CHROME_ROMETE_USER_NAME="$1"
+CHROME_REMOTE_USER_NAME="$1"
 CHROME_REMOTE_DESKTOP_CODE="$2"
 PRE_CONFIGURED_PIN="123456"
 shift
@@ -60,10 +60,10 @@ sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
 rm "./chrome-remote-desktop_current_amd64.deb"
 
 # Start Chrome Remote Desktop host if code is provided
-if [ -n "${CHROME_ROMETE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
+if [ -n "${CHROME_REMOTE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
   echo "Starting Chrome Remote Desktop..."
   # Run start-host as the current user, not as root directly
-  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_ROMETE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
   echo "Finish Starting Chrome Remote Desktop"
   else
   echo "Chrome Remote Desktop start skipped because code was not provided."
@@ -86,6 +86,10 @@ echo "Installing VsCode..."
 sudo snap install --classic code
 wait
 echo "VsCode installation completed."
+
+# Set default desktop environment for the current user
+echo "Setting default desktop environment for user ${CHROME_REMOTE_USER_NAME}..."
+sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
 
 # End timer
 end_time=$(date +%s)
