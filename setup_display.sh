@@ -94,17 +94,6 @@ echo "VsCode installation completed."
 
 # Reload desktop environment for the current user
 if [ $DISPLAY_INSTALL_STATUS -eq 0 ]; then
-  echo "Setting manual proxy settings (127.0.0.1:8080) for Chrome Remote Desktop session..."
-  export http_proxy="http://127.0.0.1:8080"
-  export https_proxy="https://127.0.0.1:8080"
-  export no_proxy="localhost,127.0.0.1,$(hostname)"
-  sudo -u ${CHROME_REMOTE_USER_NAME} gsettings set org.gnome.system.proxy mode 'manual'
-  sudo -u ${CHROME_REMOTE_USER_NAME} gsettings set org.gnome.system.proxy.http host '127.0.0.1'
-  sudo -u ${CHROME_REMOTE_USER_NAME} gsettings set org.gnome.system.proxy.http port 8080
-  sudo -u ${CHROME_REMOTE_USER_NAME} gsettings set org.gnome.system.proxy.https host '127.0.0.1'
-  sudo -u ${CHROME_REMOTE_USER_NAME} gsettings set org.gnome.system.proxy.https port 8080
-  echo "Manual proxy settings applied."
-
   echo "Reload desktop environment for the current user ${CHROME_REMOTE_USER_NAME}..."
   sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
  else
