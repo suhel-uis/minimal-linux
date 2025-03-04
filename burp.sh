@@ -24,6 +24,29 @@ cd "${BURP_INSTALL_DIR}" || { # Change directory, exit if fails
 echo "Working directory changed to: $(pwd)" # Print current working directory
 
 
+# --- 1. Verify xvfb-run command (direct execution) ---
+echo "Verifying xvfb-run command (direct execution)..."
+XVFB_RUN_CHECK_OUTPUT=$(xvfb-run echo "xvfb-run test" 2>&1) # Try a simple command with xvfb-run
+XVFB_RUN_CHECK_STATUS=$?
+echo "xvfb-run echo output:"
+echo "${XVFB_RUN_CHECK_OUTPUT}"
+echo "xvfb-run echo exit status: ${XVFB_RUN_CHECK_STATUS}"
+
+if [ $XVFB_RUN_CHECK_STATUS -ne 0 ]; then
+  echo "Error: xvfb-run command is NOT working (direct execution)."
+  echo "Please check your xvfb installation and PATH."
+  return 1
+else
+  echo "xvfb-run command seems to be working (direct execution)."
+fi
+
+
+# --- 2. List contents of Burp Suite installation directory ---
+echo "Listing contents of Burp Suite installation directory: /opt/BurpSuiteCommunity"
+BURP_DIR_CONTENTS=$(ls -l /opt/BurpSuiteCommunity)
+echo "${BURP_DIR_CONTENTS}"
+
+
 # Attempt to run Burp Suite in foreground with xvfb and capture output (using just the name now)
 echo "Attempting to run Burp Suite in foreground WITH xvfb from current directory..."
 BURP_START_COMMAND="xvfb-run BurpSuiteCommunity" # Use just 'BurpSuiteCommunity' - NO './'
@@ -46,7 +69,6 @@ else
 fi
 
 sleep 15 # Wait a bit more after foreground start
-
 
 
 echo "Downloading Burp Suite CA certificate..."
