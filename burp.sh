@@ -13,13 +13,27 @@ sudo apt install -yqq net-tools
 echo "net-tools installation complete."
 
 
-# Run Burp Suite in background with xvfb and download certificate
+# Check for processes using port 8080 BEFORE starting Burp Suite
+echo "Checking for processes already using port 8080 BEFORE starting Burp Suite..."
+PORT_8080_PROCESSES=$(sudo lsof -i :8080) # Use lsof to list processes using port 8080
+if [ -n "${PORT_8080_PROCESSES}" ]; then # Check if the variable is NOT empty (meaning something is using the port)
+  echo "Warning: Port 8080 is already in use BEFORE starting Burp Suite!"
+  echo "Processes using port 8080:"
+  echo "${PORT_8080_PROCESSES}"
+  echo "Please investigate and resolve the port conflict before proceeding."
+  return 1 # Exit the script as we cannot start Burp Suite on port 8080 if it's in use.
+else
+  echo "Port 8080 is free before starting Burp Suite."
+fi
+
+
+# Run Burp Suite in background with xvfb and download certificate (rest of the script remains similar)
 echo "Running Burp Suite in background with xvfb to download certificate..."
 BURP_START_COMMAND="xvfb-run /opt/BurpSuiteCommunity/BurpSuiteCommunity --disable-extensions"
 
 nohup ${BURP_START_COMMAND} > /dev/null 2>&1 &
 
-sleep 60 # Wait for Burp Suite to start (increased to 60 seconds - be patient)
+sleep 60 # Wait for Burp Suite to start
 
 # Check if Burp Suite process is running (using pgrep -f)
 if pgrep -f "BurpSuiteCommunity"; then
