@@ -26,14 +26,26 @@ else
   echo "Port 8080 is free before starting Burp Suite."
 fi
 
+# Attempt to run Burp Suite in foreground with xvfb and capture output
+echo "Attempting to run Burp Suite in foreground WITH xvfb to capture output..."
+BURP_START_COMMAND="xvfb-run /opt/BurpSuiteCommunity/BurpSuiteCommunity" # Removed --disable-extensions for this test
 
-# Run Burp Suite in background with xvfb and download certificate (rest of the script remains similar)
-echo "Running Burp Suite in background with xvfb to download certificate..."
-BURP_START_COMMAND="xvfb-run /opt/BurpSuiteCommunity/BurpSuiteCommunity --disable-extensions"
+# Try running Burp Suite in foreground with xvfb and capture any output (including errors)
+BURP_OUTPUT=$(timeout 60s "${BURP_START_COMMAND}" 2>&1) # Capture both stdout and stderr, timeout after 60s
+BURP_START_STATUS=$? # Get the exit status of the Burp Suite command
 
-nohup ${BURP_START_COMMAND} > /dev/null 2>&1 &
+echo "Burp Suite startup command: ${BURP_START_COMMAND}"
+echo "Burp Suite output (stdout and stderr):"
+echo "${BURP_OUTPUT}"
+echo "Burp Suite startup exit status: ${BURP_START_STATUS}"
 
-sleep 60 # Wait for Burp Suite to start
+if [ $BURP_START_STATUS -eq 0 ]; then
+  echo "Burp Suite seems to have started successfully (exit code 0, with xvfb - foreground)."
+else
+  echo "Error: Burp Suite startup FAILED (non-zero exit code: ${BURP_START_STATUS}, with xvfb - foreground)."
+  echo "Please examine the Burp Suite output above for error messages."
+  return 1 # Exit the script with an error code
+fi
 
 # Check if Burp Suite process is running (using pgrep -f)
 if pgrep -f "BurpSuiteCommunity"; then
