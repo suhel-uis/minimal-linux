@@ -6,10 +6,10 @@ mkdir -p "${BURP_CERT_DIR}"
 echo "Running Burp Suite in background to download certificate..."
 nohup /opt/BurpSuiteCommunity/BurpSuiteCommunity --disable-extensions > /dev/null 2>&1 &
 
-sleep 45 # Wait for Burp Suite to start (increased to 45 seconds)
+sleep 60 # Wait for Burp Suite to start (increased to 60 seconds)
 
-# Check if Burp Suite process is running
-if pgrep -x "BurpSuiteCommunity"; then
+# Check if Burp Suite process is running (using pgrep -f)
+if pgrep -f "BurpSuiteCommunity"; then
   echo "Burp Suite process is running."
 else
   echo "Error: Burp Suite process is NOT running after waiting."
@@ -32,9 +32,9 @@ fi
 
 echo "Downloading Burp Suite CA certificate..."
 PROXY_HOST="127.0.0.1:8080" # Proxy settings to use for curl, matching your script's proxy settings
-CERT_FILE="${BURP_CERT_DIR}/cacert.der"
-curl --proxy "${PROXY_HOST}" http://burp/cert -o "${CERT_FILE}"
-CERT_DOWNLOAD_STATUS=$? # Capture the exit status of the curl command
+CERT_FILE="<span class="math-inline">\{BURP\_CERT\_DIR\}/cacert\.der"
+curl \-\-proxy "</span>{PROXY_HOST}" http://burp/cert -o "<span class="math-inline">\{CERT\_FILE\}"
+CERT\_DOWNLOAD\_STATUS\=</span>? # Capture the exit status of the curl command
 
 if [ $CERT_DOWNLOAD_STATUS -eq 0 ]; then
   echo "Burp Suite CA certificate downloaded to: ${CERT_FILE}"
