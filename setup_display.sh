@@ -76,7 +76,7 @@ fi
 
 # Install packages Gui
 echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller dbus-x11
 wait
 echo "GUI installation completed."
 
@@ -96,6 +96,14 @@ echo "VsCode installation completed."
 if [ $DISPLAY_INSTALL_STATUS -eq 0 ]; then
   echo "Reload desktop environment for the current user ${CHROME_REMOTE_USER_NAME}..."
   sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
+
+  echo "Setting manual proxy settings (127.0.0.1:8080) for Chrome Remote Desktop session..."
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy mode 'manual'
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http host '127.0.0.1'
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http port 8080
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host '127.0.0.1'
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port 8080
+  echo "Manual proxy settings applied."
  else
   echo "GUI installation failed. Skipping desktop environment reload."
 fi
