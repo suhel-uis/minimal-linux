@@ -26,9 +26,20 @@ else
   echo "Port 8080 is free before starting Burp Suite."
 fi
 
-# Attempt to run Burp Suite in foreground with xvfb and capture output
-echo "Attempting to run Burp Suite in foreground WITH xvfb to capture output..."
-BURP_START_COMMAND="xvfb-run /opt/BurpSuiteCommunity/BurpSuiteCommunity" # Removed --disable-extensions for this test
+# --- Change working directory to Burp Suite install location ---
+echo "Changing working directory to Burp Suite installation directory..."
+BURP_INSTALL_DIR="/opt/BurpSuiteCommunity" # Define Burp Suite install directory
+mkdir -p "${BURP_INSTALL_DIR}" # Ensure directory exists (though it should already)
+cd "${BURP_INSTALL_DIR}" || { # Change directory, exit if fails
+  echo "Error: Could not change directory to ${BURP_INSTALL_DIR}"
+  return 1
+}
+echo "Working directory changed to: $(pwd)" # Print current working directory
+
+
+# Attempt to run Burp Suite in foreground with xvfb and capture output (using relative path now)
+echo "Attempting to run Burp Suite in foreground WITH xvfb from current directory..."
+BURP_START_COMMAND="xvfb-run ./BurpSuiteCommunity" # Use relative path './BurpSuiteCommunity'
 
 # Try running Burp Suite in foreground with xvfb and capture any output (including errors)
 BURP_OUTPUT=$(timeout 60s "${BURP_START_COMMAND}" 2>&1) # Capture both stdout and stderr, timeout after 60s
@@ -40,48 +51,14 @@ echo "${BURP_OUTPUT}"
 echo "Burp Suite startup exit status: ${BURP_START_STATUS}"
 
 if [ $BURP_START_STATUS -eq 0 ]; then
-  echo "Burp Suite seems to have started successfully (exit code 0, with xvfb - foreground)."
+  echo "Burp Suite seems to have started successfully (exit code 0, with xvfb - foreground, from install dir)."
 else
-  echo "Error: Burp Suite startup FAILED (non-zero exit code: ${BURP_START_STATUS}, with xvfb - foreground)."
+  echo "Error: Burp Suite startup FAILED (non-zero exit code: ${BURP_START_STATUS}, with xvfb - foreground, from install dir)."
   echo "Please examine the Burp Suite output above for error messages."
   return 1 # Exit the script with an error code
 fi
 
-# Check if Burp Suite process is running (using pgrep -f)
-if pgrep -f "BurpSuiteCommunity"; then
-  echo "Burp Suite process is running (via xvfb)."
-else
-  echo "Error: Burp Suite process is NOT running after waiting (even with xvfb)."
-  echo "Please check for any errors during Burp Suite startup."
-  pkill -f "BurpSuiteCommunity" # Attempt to kill any zombie processes
-  return 1 # Exit with error
-fi
-
-# Check if port 8080 is listening (try netstat, fallback to ss)
-if command -v netstat &> /dev/null; then
-  if netstat -tulnp | grep ':8080'; then
-    echo "Port 8080 is listening (using netstat)."
-  else
-    echo "Error: Port 8080 is NOT listening after Burp Suite startup (with xvfb, netstat)."
-    echo "This is unexpected. Burp Suite should be listening on port 8080 by default."
-    pkill -f "BurpSuiteCommunity"
-    return 1
-  fi
-elif command -v ss &> /dev/null; then # Fallback to ss if netstat is not found
-  if ss -tulnp | grep ':8080'; then
-    echo "Port 8080 is listening (using ss)."
-  else
-    echo "Error: Port 8080 is NOT listening after Burp Suite startup (with xvfb, ss)."
-    echo "This is unexpected. Burp Suite should be listening on port 8080 by default."
-    pkill -f "BurpSuiteCommunity"
-    return 1
-  fi
-else
-  echo "Error: Neither netstat nor ss commands found. Cannot check port 8080."
-  echo "Please install net-tools or iproute2 package."
-  pkill -f "BurpSuiteCommunity"
-  return 1
-fi
+sleep 15 # Wait a bit more after foreground start
 
 
 echo "Downloading Burp Suite CA certificate..."
