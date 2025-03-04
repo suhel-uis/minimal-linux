@@ -2,38 +2,37 @@
 BURP_CERT_DIR="$HOME/burp_certificate"
 mkdir -p "${BURP_CERT_DIR}"
 
-# Run Burp Suite in foreground and check for errors
-echo "Attempting to run Burp Suite in foreground to capture output..."
-BURP_START_COMMAND="/opt/BurpSuiteCommunity/BurpSuiteCommunity"
+# Install xvfb if not already installed (just to be sure)
+echo "Ensuring xvfb is installed..."
+sudo apt install -yqq xvfb
+echo "xvfb installation complete."
 
-# Try running Burp Suite and capture any output (including errors)
-BURP_OUTPUT=$(timeout 60s "${BURP_START_COMMAND}" 2>&1) # Capture both stdout and stderr, timeout after 60s
-BURP_START_STATUS=$? # Get the exit status of the Burp Suite command
+# Run Burp Suite in background with xvfb and download certificate
+echo "Running Burp Suite in background with xvfb to download certificate..."
+BURP_START_COMMAND="xvfb-run /opt/BurpSuiteCommunity/BurpSuiteCommunity --disable-extensions"
 
-echo "Burp Suite startup command: ${BURP_START_COMMAND}"
-echo "Burp Suite output (stdout and stderr):"
-echo "${BURP_OUTPUT}"
-echo "Burp Suite startup exit status: ${BURP_START_STATUS}"
+nohup ${BURP_START_COMMAND} > /dev/null 2>&1 &
 
-if [ $BURP_START_STATUS -eq 0 ]; then
-  echo "Burp Suite seems to have started successfully (exit code 0)."
+sleep 60 # Wait for Burp Suite to start (increased to 60 seconds - again, be patient)
+
+# Check if Burp Suite process is running (using pgrep -f)
+if pgrep -f "BurpSuiteCommunity"; then
+  echo "Burp Suite process is running (via xvfb)."
 else
-  echo "Error: Burp Suite startup FAILED (non-zero exit code: ${BURP_START_STATUS})."
-  echo "Please examine the Burp Suite output above for error messages."
-  return 1 # Exit the script with an error code
+  echo "Error: Burp Suite process is NOT running after waiting (even with xvfb)."
+  echo "Please check for any errors during Burp Suite startup. (No detailed logs for Community Edition)"
+  pkill -f "BurpSuiteCommunity" # Attempt to kill any zombie processes
+  return 1 # Exit with error
 fi
 
-
-sleep 15 # Wait a bit more after foreground start, just in case.
-
-# Check if port 8080 is listening (after foreground attempt)
+# Check if port 8080 is listening
 if netstat -tulnp | grep ':8080'; then
   echo "Port 8080 is listening (something is using it)."
 else
-  echo "Error: Port 8080 is NOT listening even after foreground Burp Suite attempt."
+  echo "Error: Port 8080 is NOT listening after Burp Suite startup (with xvfb)."
   echo "This is unexpected. Burp Suite should be listening on port 8080 by default."
-  pkill -f "BurpSuiteCommunity" # Attempt to kill if port is not listening (just in case)
-  return 1 # Exit the script with an error code
+  pkill -f "BurpSuiteCommunity" # Attempt to kill if port is not listening
+  return 1 # Exit with error
 fi
 
 
@@ -46,9 +45,9 @@ CERT_DOWNLOAD_STATUS=$?
 if [ $CERT_DOWNLOAD_STATUS -eq 0 ]; then
   echo "Burp Suite CA certificate downloaded to: ${CERT_FILE}"
 else
-  echo "Error: Failed to download Burp Suite CA certificate (again)."
+  echo "Error: Failed to download Burp Suite CA certificate (again, even with xvfb)."
   echo "Curl error code: ${CERT_DOWNLOAD_STATUS}"
-  echo "Please check Burp Suite configuration and network settings."
+  echo "Please check Burp Suite configuration, network settings, and xvfb setup."
 fi
 
 # Kill Burp Suite process (again, for cleanup)
