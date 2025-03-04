@@ -3,6 +3,15 @@
 # Start timer
 start_time=$(date +%s)
 
+# Read Chrome Remote Desktop code from command line argument
+CHROME_REMOTE_DESKTOP_CODE="$1"
+shift
+
+# Get the user name and remote desktop default pin
+CHROME_REMOTE_USER_NAME="${SUDO_USER}"
+PRE_CONFIGURED_PIN="123456"
+
+# Default burpsuit version
 DEFAULT_BURP_VERSION="2025.1.1"
 
 # Fetch Burp version (improved error handling)
@@ -40,17 +49,8 @@ echo "Downloading installation files in parallel..."
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
 wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
-
-# Install packages Gui
-echo "Installing minimal desktop environment and applications..."
-sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller
-GUI_INSTALL_PID=$! # Capture the process ID of the GUI installation
-
-wait # Wait for all background wget processes to complete
+wait
 echo "Downloads completed."
-
-wait $GUI_INSTALL_PID # Wait for the GUI installation to complete
-echo "GUI installation completed."
 
 # Install Google Chrome Stable
 echo "Installing Google Chrome Stable..."
@@ -62,6 +62,24 @@ echo "Installing Chrome Remote Desktop..."
 sudo ${APT_INSTALL_CMD} install -yqq "./chrome-remote-desktop_current_amd64.deb"
 rm "./chrome-remote-desktop_current_amd64.deb"
 
+# Start Chrome Remote Desktop host if code is provided
+DISPLAY_INSTALL_STATUS=0
+if [ -n "${CHROME_REMOTE_USER_NAME}" -a -n "${CHROME_REMOTE_DESKTOP_CODE}" ]; then
+  echo "Starting Chrome Remote Desktop..."
+  DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="${CHROME_REMOTE_DESKTOP_CODE}" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname) --user-name="${CHROME_REMOTE_USER_NAME}" --pin="${PRE_CONFIGURED_PIN}"
+  DISPLAY_INSTALL_STATUS=$?
+  wait
+  echo "Finish Starting Chrome Remote Desktop"
+ else
+  echo "Chrome Remote Desktop start skipped because code was not provided."
+fi
+
+# Install packages Gui
+echo "Installing minimal desktop environment and applications..."
+sudo ${APT_INSTALL_CMD} install -yqq ubuntu-desktop-minimal --no-install-recommends network-manager file-roller dbus-x11
+wait
+echo "GUI installation completed."
+
 # Install Burp Suite Community Edition
 echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
 sudo chmod +x burpsuite
@@ -71,8 +89,24 @@ rm burpsuite
 # Install VsCode
 echo "Installing VsCode..."
 sudo snap install --classic code
-wait # Wait for the VsCode installation to complete
+wait
 echo "VsCode installation completed."
+
+# Reload desktop environment for the current user
+if [ $DISPLAY_INSTALL_STATUS -eq 0 ]; then
+  echo "Reload desktop environment for the current user ${CHROME_REMOTE_USER_NAME}..."
+  sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
+
+  echo "Setting manual proxy settings (127.0.0.1:8080) for Chrome Remote Desktop session..."
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy mode 'manual'
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http host '127.0.0.1'
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http port 8080
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host '127.0.0.1'
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port 8080
+  echo "Manual proxy settings applied."
+ else
+  echo "GUI installation failed. Skipping desktop environment reload."
+fi
 
 # End timer
 end_time=$(date +%s)
