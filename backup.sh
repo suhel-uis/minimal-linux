@@ -14,6 +14,13 @@ PRE_CONFIGURED_PIN="123456"
 # Default burpsuit version
 DEFAULT_BURP_VERSION="2025.1.1"
 
+# Default package install
+APT_INSTALL_CMD="apt"
+
+# Default IP Address and Port
+IP_ADDRESS='127.0.0.1'
+PORT=8080
+
 # Fetch Burp version (improved error handling)
 BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
 
@@ -29,19 +36,18 @@ fi
 # Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
 sudo add-apt-repository ppa:apt-fast/stable -y
-sudo apt update -yqq
+sudo ${APT_INSTALL_CMD} update -yqq
 echo debconf apt-fast/maxdownloads string 16 | sudo debconf-set-selections
 echo debconf apt-fast/dlflag boolean true | sudo debconf-set-selections
 echo debconf apt-fast/aptmanager string apt-get | sudo debconf-set-selections
-sudo apt install apt-fast -yqq
+sudo ${APT_INSTALL_CMD} install apt-fast -yqq
 
 # Check again if apt-fast is installed after attempting installation
 if command -v apt-fast &> /dev/null; then
   APT_INSTALL_CMD="apt-fast"
   echo "apt-fast installed successfully. Using apt-fast for package installations."
  else
-  APT_INSTALL_CMD="apt"
-  echo "apt-fast installation failed. Falling back to using apt for package installations."
+  echo "apt-fast installation failed. Using apt for package installations."
 fi
 
 # Download all files upfront in parallel - Chrome Remote Desktop, Google Chrome Stable, VS Code, Burp Suite Community Edition.
@@ -97,12 +103,12 @@ if [ $DISPLAY_INSTALL_STATUS -eq 0 ]; then
   echo "Reload desktop environment for the current user ${CHROME_REMOTE_USER_NAME}..."
   sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
 
-  echo "Setting manual proxy settings (127.0.0.1:8080) for Chrome Remote Desktop session..."
+  echo "Setting manual proxy settings (${IP_ADDRESS}:${PORT}) for Chrome Remote Desktop session..."
   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy mode 'manual'
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http host '127.0.0.1'
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http port 8080
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host '127.0.0.1'
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port 8080
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http host ${IP_ADDRESS}
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http port ${PORT}
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host ${IP_ADDRESS}
+  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port ${PORT}
   echo "Manual proxy settings applied."
  else
   echo "GUI installation failed. Skipping desktop environment reload."
