@@ -26,7 +26,7 @@ if [ -n "$1" ]; then
 else
     # Prompt user for the Chrome Remote Desktop command
     echo "Please paste the complete Chrome Remote Desktop command:"
-    echo "Example: DISPLAY= /opt/google/chrome-remote-desktop/start-host --code=\"4/0AVMBsJig--f3b-bFyvujt6867rqnXn70t6NRIVw_FQ6XMy4l6kW_sU0EspNNY1-raU8wnw\" --redirect-url=\"https://remotedesktop.google.com/_/oauthredirect\" --name=\$(hostname)"
+    echo "Example: DISPLAY= /opt/google/chrome-remote-desktop/start-host --code=\"A/AAX4XfWjLm9kR2pQvN8uY5tE3rS6wZ1oI7bV4cD0fG8hJ2kL9mN6pQ3rS5tU8vW1xY4zA7bC\" --redirect-url=\"https://remotedesktop.google.com/_/oauthredirect\" --name=\$(hostname)"
     echo ""
     read -p "Enter command: " FULL_CHROME_COMMAND
     
