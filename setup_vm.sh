@@ -3,9 +3,47 @@
 # Start timer
 start_time=$(date +%s)
 
-# Read Chrome Remote Desktop code from command line argument
-CHROME_REMOTE_DESKTOP_CODE="$1"
-shift
+# Function to extract code from Chrome Remote Desktop command
+extract_chrome_code() {
+    local full_command="$1"
+    # Extract the code between quotes after --code=
+    echo "$full_command" | grep -oP '(?<=--code=")[^"]*'
+}
+
+# Read Chrome Remote Desktop code from command line argument or prompt user
+if [ -n "$1" ]; then
+    # If argument provided, check if it's a full command or just the code
+    if [[ "$1" == *"--code="* ]]; then
+        # It's a full command, extract the code
+        CHROME_REMOTE_DESKTOP_CODE=$(extract_chrome_code "$1")
+        echo "Code extracted from command: ${CHROME_REMOTE_DESKTOP_CODE}"
+    else
+        # It's just the code
+        CHROME_REMOTE_DESKTOP_CODE="$1"
+        echo "Using provided code: ${CHROME_REMOTE_DESKTOP_CODE}"
+    fi
+    shift
+else
+    # Prompt user for the Chrome Remote Desktop command
+    echo "Please paste the complete Chrome Remote Desktop command:"
+    echo "Example: DISPLAY= /opt/google/chrome-remote-desktop/start-host --code=\"4/0AVMBsJig--f3b-bFyvujt6867rqnXn70t6NRIVw_FQ6XMy4l6kW_sU0EspNNY1-raU8wnw\" --redirect-url=\"https://remotedesktop.google.com/_/oauthredirect\" --name=\$(hostname)"
+    echo ""
+    read -p "Enter command: " FULL_CHROME_COMMAND
+    
+    if [ -n "$FULL_CHROME_COMMAND" ]; then
+        CHROME_REMOTE_DESKTOP_CODE=$(extract_chrome_code "$FULL_CHROME_COMMAND")
+        if [ -n "$CHROME_REMOTE_DESKTOP_CODE" ]; then
+            echo "Code successfully extracted: ${CHROME_REMOTE_DESKTOP_CODE}"
+        else
+            echo "Error: Could not extract code from the provided command."
+            echo "Please make sure the command contains --code=\"...\" format."
+            exit 1
+        fi
+    else
+        echo "No command provided. Chrome Remote Desktop will be skipped."
+        CHROME_REMOTE_DESKTOP_CODE=""
+    fi
+fi
 
 # Get the user name and remote desktop default pin
 CHROME_REMOTE_USER_NAME="${SUDO_USER}"
