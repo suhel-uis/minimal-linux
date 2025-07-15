@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Start timer
-start_time=$(date +%s)
+# Set variables:
+PRE_CONFIGURED_PIN="123456"
+TIMEZONE="Europe/Lisbon"
+
+# set timezone if a variable is defined
+if [ -n "${TIMEZONE}" ]; then
+  sudo timedatectl set-timezone ${TIMEZONE}
+fi
 
 # Function to extract code from Chrome Remote Desktop command
 extract_chrome_code() {
@@ -45,31 +51,19 @@ else
     fi
 fi
 
+# Start timer now
+start_time=$(date +%s)
+
+
 # Get the user name and remote desktop default pin
 CHROME_REMOTE_USER_NAME="${SUDO_USER}"
-PRE_CONFIGURED_PIN="123456"
 
-# Default burpsuit version
-DEFAULT_BURP_VERSION="2025.1.1"
-
-# Default package install
 APT_INSTALL_CMD="apt"
 
 # Default IP Address and Port
 IP_ADDRESS='127.0.0.1'
 PORT=8080
 
-# Fetch Burp version (improved error handling)
-BURP_VERSION_RAW=$(curl -s "https://portswigger.net/burp/releases" | grep -oP 'Professional / Community \K\d+\.\d+\.\d+' | head -n 1)
-
-if [ -z "${BURP_VERSION_RAW}" ]; then
-  echo "Warning: Could not automatically determine the latest Burp Suite version."
-  echo "Falling back to default Burp Suite version: ${DEFAULT_BURP_VERSION}"
-  BURP_VERSION="${DEFAULT_BURP_VERSION}"
-else
-  BURP_VERSION="${BURP_VERSION_RAW}"
-  echo "Latest Burp Suite Community Edition version found: ${BURP_VERSION}"
-fi
 
 # Update the packages lists and install apt-fast
 echo "Installing apt-fast..."
@@ -92,7 +86,7 @@ fi
 echo "Downloading installation files in parallel..."
 wget -q "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O google-chrome-stable_current_amd64.deb &
 wget -q "https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb" -O chrome-remote-desktop_current_amd64.deb &
-wget -q "https://portswigger.net/burp/releases/startdownload?product=community&version=${BURP_VERSION}&type=Linux" -O burpsuite &
+wget -q "https://portswigger.net/burp/releases/startdownload?product=community&type=Linux" -O burpsuite &
 wait
 echo "Downloads completed."
 
@@ -125,7 +119,7 @@ wait
 echo "GUI installation completed."
 
 # Install Burp Suite Community Edition
-echo "Installing Burp Suite Community Edition (Version: ${BURP_VERSION})..."
+echo "Installing Burp Suite Community Edition ..."
 sudo chmod +x burpsuite
 sudo ./burpsuite -q
 rm burpsuite
