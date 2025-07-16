@@ -149,8 +149,8 @@ if [ $DISPLAY_INSTALL_STATUS -eq 0 ]; then
 #   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host ${IP_ADDRESS}
 #   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port ${PORT}
 #   echo "Manual proxy settings applied."
-#  else
-#   echo "GUI installation failed. Skipping desktop environment reload."
+else
+   echo "GUI installation failed. Skipping desktop environment reload."
 fi
 
 # End timer
