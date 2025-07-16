@@ -129,21 +129,28 @@ echo "Installing VsCode..."
 sudo snap install --classic code
 wait
 echo "VsCode installation completed."
+echo "Installing VSCode extensions:"
+code --install-extension esbenp.prettier-vscode
+code --install-extension ipatalas.vscode-postfix-ts
+code --install-extension aaravb.chrome-extension-developer-tools
+code --install-extension solomonkinard.chrome-extension-api
+echo "done."
 
 # Reload desktop environment for the current user
 if [ $DISPLAY_INSTALL_STATUS -eq 0 ]; then
   echo "Reload desktop environment for the current user ${CHROME_REMOTE_USER_NAME}..."
   sudo systemctl restart chrome-remote-desktop@${CHROME_REMOTE_USER_NAME}.service
 
-  echo "Setting manual proxy settings (${IP_ADDRESS}:${PORT}) for Chrome Remote Desktop session..."
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy mode 'manual'
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http host ${IP_ADDRESS}
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http port ${PORT}
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host ${IP_ADDRESS}
-  sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port ${PORT}
-  echo "Manual proxy settings applied."
- else
-  echo "GUI installation failed. Skipping desktop environment reload."
+# Sytem wide burp proxy
+#   echo "Setting manual proxy settings (${IP_ADDRESS}:${PORT}) for Chrome Remote Desktop session..."
+#   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy mode 'manual'
+#   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http host ${IP_ADDRESS}
+#   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.http port ${PORT}
+#   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https host ${IP_ADDRESS}
+#   sudo -u ${CHROME_REMOTE_USER_NAME} dbus-launch gsettings set org.gnome.system.proxy.https port ${PORT}
+#   echo "Manual proxy settings applied."
+#  else
+#   echo "GUI installation failed. Skipping desktop environment reload."
 fi
 
 # End timer

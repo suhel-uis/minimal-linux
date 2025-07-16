@@ -98,7 +98,7 @@ Enter command: [PASTE YOUR COMMAND HERE]
 7. ✅ XFCE4 desktop environment installation
 8. ✅ Burp Suite installation
 9. ✅ VS Code installation
-10. ✅ Proxy configuration for Burp Suite
+10. ✅ VS Code extensions: prettier, postfix, chrome-extension-api, chrome-extension-developer-tools
 
 ## After installation
 
