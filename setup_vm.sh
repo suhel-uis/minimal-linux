@@ -130,10 +130,10 @@ sudo snap install --classic code
 wait
 echo "VsCode installation completed."
 echo "Installing VSCode extensions:"
-code --install-extension esbenp.prettier-vscode
-code --install-extension ipatalas.vscode-postfix-ts
-code --install-extension aaravb.chrome-extension-developer-tools
-code --install-extension solomonkinard.chrome-extension-api
+sudo -u ${CHROME_REMOTE_USER_NAME} code --install-extension esbenp.prettier-vscode
+sudo -u ${CHROME_REMOTE_USER_NAME} code --install-extension ipatalas.vscode-postfix-ts
+sudo -u ${CHROME_REMOTE_USER_NAME} code --install-extension aaravb.chrome-extension-developer-tools
+sudo -u ${CHROME_REMOTE_USER_NAME} code --install-extension solomonkinard.chrome-extension-api
 echo "done."
 
 # Reload desktop environment for the current user
